@@ -50,6 +50,13 @@ module SoftwareVersion
       expect(a < b).to be true
     end
 
+    it 'compare 1.1-1-3 < 1.1-2' do
+      a = Version.new('1.1-1-3')
+      b = Version.new('1.1-2')
+
+      expect(a < b).to be true
+    end
+
     it 'define nil version' do
       expect(Version.new(nil).to_s).to eql('')
     end

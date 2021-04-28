@@ -73,13 +73,9 @@ module SoftwareVersion
         @release = '0'
       end
 
-      if (parsed_version = version.match(/(.*)-(.*)$/))
-        @version = parsed_version[1]
-        @revision = parsed_version[2]
-      else
-        @version = version
-        @revision = '0'
-      end
+      @version, @revision = version.split('-', 2)
+      @version ||= version
+      @revision ||= '0'
     end
 
     # Parse the version to get the major, minor and patch parts
