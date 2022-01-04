@@ -50,7 +50,7 @@ module SoftwareVersion
     end
 
     def patch
-      sv[2]
+      sv[2..].join unless sv[2..].blank?
     end
 
     private

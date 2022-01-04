@@ -228,6 +228,14 @@ module SoftwareVersion
             expect(subject).to eq nil
           end
         end
+
+        context 'with 19.1R2 parts' do
+          let(:version) { Version.new('19.1R2') }
+
+          it 'returns R2' do
+            expect(subject).to eq 'R2'
+          end
+        end
       end
     end
   end
