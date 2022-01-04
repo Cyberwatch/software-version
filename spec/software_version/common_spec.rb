@@ -205,6 +205,14 @@ module SoftwareVersion
       end
 
       context 'when Version exist' do
+        context 'with 4 parts' do
+          let(:version) { Version.new('11.22.33.44') }
+
+          it 'returns 33' do
+            expect(subject).to eq '33'
+          end
+        end
+
         context 'with 3 parts' do
           let(:version) { Version.new('11.22.33') }
 
@@ -229,11 +237,19 @@ module SoftwareVersion
           end
         end
 
-        context 'with 19.1R2 parts' do
-          let(:version) { Version.new('19.1R2') }
+        context 'with 19.1R2-S8' do
+          let(:version) { Version.new('19.1R2-S8') }
 
           it 'returns R2' do
             expect(subject).to eq 'R2'
+          end
+        end
+
+        context 'with KB.16.10.0012' do
+          let(:version) { Version.new('KB.16.10.0012') }
+
+          it 'returns 10' do
+            expect(subject).to eq '10'
           end
         end
       end

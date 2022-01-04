@@ -50,7 +50,7 @@ module SoftwareVersion
     end
 
     def patch
-      sv[2..].join unless sv[2..].blank?
+      sv[2]
     end
 
     private
@@ -80,7 +80,7 @@ module SoftwareVersion
 
     # Parse the version to get the major, minor and patch parts
     def sv
-      @sv ||= version.scan(/(?:\d+|[a-zA-Z]+)/)
+      @sv ||= version.scan(/(?:\d+|[a-zA-Z]+(?>\d+)?)/)
     end
 
     def version_split_digits(part)
