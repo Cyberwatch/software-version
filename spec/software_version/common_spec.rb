@@ -8,6 +8,7 @@ module SoftwareVersion
       @v3 = Version.new('1.4.8')
       @v4 = Version.new('1.10.5')
       @v5 = Version.new('1.10')
+      @v6 = Version.new('1.0')
     end
 
     it 'check version 1' do
@@ -38,16 +39,12 @@ module SoftwareVersion
 
     it 'check equality' do
       expect(@v1 == Version.new('1.0.0')).to be true
+      expect(@v1 == Version.new('1.0')).to be true
+      expect(@v1 == Version.new('1.00')).to be true
+      expect(@v1 == Version.new('1')).to be true
       expect(@v2 == Version.new('1.5.5')).to be true
       expect(@v3 == Version.new('1.4.8')).to be true
       expect(@v4 == Version.new('1.10.5')).to be true
-    end
-
-    it 'compare 1.00 < 1.0.0' do
-      a = Version.new('1.00')
-      b = Version.new('1.0.0')
-
-      expect(a < b).to be true
     end
 
     it 'compare 1.1-1-3 < 1.1-2' do

@@ -120,6 +120,10 @@ module SoftwareVersion
     end
 
     def version_compare_string(self_part, other_part)
+      # This is a workaround so that `'1' == '1.0' == '1.0.0'`
+      # It forces '0' to equal '.'
+      return 0 if ['0', '.'].include?(self_part) && ['0', '.'].include?(other_part)
+
       self_part = self_part.chars.map { |x| version_order(x) }
       other_part = other_part.chars.map { |x| version_order(x) }
 
