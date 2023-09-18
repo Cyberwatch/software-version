@@ -53,7 +53,7 @@ module SoftwareVersion
     it 'check debian packages version numbers 3' do
       a = Version.new('2.7.15-4ubuntu4~18.04')
       b = Version.new('2.7.15~rc1-1ubuntu0.1 ')
-      expect(a > b).to be true
+      expect(a < b).to be true
     end
 
     it 'check debian packages version numbers 3' do

@@ -7,30 +7,30 @@ module SoftwareVersion
                 :version,
                 :revision,
                 :release,
-                :arch,
-                :splitted_version
+                :arch
 
     def initialize(raw_version)
       @v = raw_version
-      @splitted_version = split_version(raw_version)
       parse_raw_version(to_s)
-    end
-
-    def split_version(software_version)
-      # From "3.15-3.0.1.module+el8.8.0+21045+adcb6a64"
-      # to ["3.15", "-", "3.0.1", ".", "module", "+", "el8", ".", "8.0", "+", "21045", "+", "adcb6a64"]
-      software_version.to_s.scan(/\d+(?:\.\d+)+|\w+|\W/)
     end
 
     def <=>(other)
       raise ArgumentError unless other.class == SoftwareVersion::Version
 
-      splitted_version.each_with_index do |part, index|
-        result = version_compare_part(part, other.splitted_version[index])
-        return result if result.nonzero?
-      end
+      # Compare the epoch of both versions
+      result = split_and_compare_parts(@epoch, other.epoch)
+      return result if result.nonzero?
 
-      result
+      # Compare the version of both versions
+      result = split_and_compare_parts(@version, other.version)
+      return result if result.nonzero?
+
+      # Compare the revision of both versions
+      result = split_and_compare_parts(@revision, other.revision)
+      return result if result.nonzero?
+
+      # Compare the release of both versions
+      split_and_compare_parts(@release, other.release)
     end
 
     def to_s
@@ -85,6 +85,19 @@ module SoftwareVersion
 
     def version_split_digits(part)
       part.scan(/(?:\d+|\D+)/)
+    end
+
+    def split_and_compare_parts(self_part, other_part)
+      # From "3.15-3.0.1.module+el8.8.0+21045+adcb6a64"
+      # to ["3.15", "-", "3.0.1", ".", "module", "+", "el8", ".", "8.0", "+", "21045", "+", "adcb6a64"]
+      splitted_other_part = other_part.to_s.scan(/\d+(?:\.\d+)+|\w+|\W/)
+      splitted_self_part = self_part.to_s.scan(/\d+(?:\.\d+)+|\w+|\W/)
+      splitted_self_part.each_with_index do |part, index|
+        result = version_compare_part(part, splitted_other_part[index] || 0)
+        return result if result.nonzero?
+      end
+
+      splitted_self_part.size <=> splitted_other_part.size
     end
 
     def version_compare_part(self_part, other_part)
