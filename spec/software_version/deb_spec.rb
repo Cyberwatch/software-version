@@ -62,6 +62,12 @@ module SoftwareVersion
       expect(a > b).to be true
     end
 
+    it 'check debian packages version' do
+      a = Version.new('3.15-3.0.1.module+el8.8.0+21045+adcb6a64')
+      b = Version.new('3.15-3.module+el8.8.0+21045+adcb6a64')
+      expect(a > b).to be true
+    end
+
     context 'Sort file test' do
       before(:all) do
         @version_array = fixture('deb_version_sort.txt').split("\n")

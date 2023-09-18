@@ -84,7 +84,7 @@ module SoftwareVersion
     end
 
     def version_split_digits(part)
-      part.scan(/(?:\d+|\D+)/)
+      part.scan(/(?:[\d.]+|\D+)/)
     end
 
     def version_compare_part(self_part, other_part)
