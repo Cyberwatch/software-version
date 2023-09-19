@@ -7,30 +7,30 @@ module SoftwareVersion
                 :version,
                 :revision,
                 :release,
-                :arch
+                :arch,
+                :splitted_version
 
     def initialize(raw_version)
       @v = raw_version
+      @splitted_version = split_version(raw_version)
       parse_raw_version(to_s)
+    end
+
+    def split_version(software_version)
+      # From "3.15-3.0.1.module+el8.8.0+21045+adcb6a64"
+      # to ["3.15", "-", "3.0.1", ".", "module", "+", "el8", ".", "8.0", "+", "21045", "+", "adcb6a64"]
+      software_version.to_s.scan(/\d+(?:\.\d+)+|\w+|\W/)
     end
 
     def <=>(other)
       raise ArgumentError unless other.class == SoftwareVersion::Version
 
-      # Compare the epoch of both versions
-      result = version_compare_part(@epoch, other.epoch)
-      return result if result.nonzero?
+      splitted_version.each_with_index do |part, index|
+        result = version_compare_part(part, other.splitted_version[index])
+        return result if result.nonzero?
+      end
 
-      # Compare the version of both versions
-      result = version_compare_part(@version, other.version)
-      return result if result.nonzero?
-
-      # Compare the revision of both versions
-      result = version_compare_part(@revision, other.revision)
-      return result if result.nonzero?
-
-      # Compare the release of both versions
-      version_compare_part(@release, other.release)
+      result
     end
 
     def to_s
@@ -84,7 +84,7 @@ module SoftwareVersion
     end
 
     def version_split_digits(part)
-      part.scan(/(?:[\d.]+|\D+)/)
+      part.scan(/(?:\d+|\D+)/)
     end
 
     def version_compare_part(self_part, other_part)
