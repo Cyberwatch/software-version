@@ -84,7 +84,7 @@ module SoftwareVersion
     end
 
     def version_split_digits(part)
-      part.scan(/(?:\d+|\D+)/)
+      part.scan(/(?:\d+|[a-zA-Z]+|\W+)/)
     end
 
     def version_compare_part(self_part, other_part)
@@ -142,13 +142,25 @@ module SoftwareVersion
     end
 
     # convert character into number
+    # Force a custom order when comparing characters
+    # The new order is '~' < "no character" < '-' < '+' < letters < not_numbers < numbers
     def version_order(part)
-      if part.eql? '~'
+      case part
+      when '~'
         -1
-      elsif part =~ /^[A-Za-z\d]$/
-        part.ord
+      when '-'
+        1
+      when '+'
+        2
+      when /[A-Za-z]/
+        # I used an high offset in case we want to add more characters < letters
+        1000 + part.ord
+      when /\d/
+        # Make sure that any number is higher than any unicode character which use 21 bits
+        (2**30) + part.ord
       else
-        part.ord + 128
+        # must be higher than any letters
+        2000 + part.ord
       end
     end
 
