@@ -90,6 +90,15 @@ module SoftwareVersion
       expect(a > b).to be true
     end
 
+    it 'compare version with caret' do
+      a = Version.new('6.0.^')
+      b = Version.new('6.0.99999')
+      c = Version.new('6.1')
+
+      expect(a > b).to be true
+      expect(a < c).to be true
+    end
+
     describe 'conversion' do
       it 'converts its argument to a version' do
         expect(SoftwareVersion::Version('1.0')).to be_a Version
@@ -201,6 +210,34 @@ module SoftwareVersion
         expect(described_class.new('1b').send(:tokens)).to eq [
           [described_class::Token::NUMBER, 1],
           [described_class::Token::WORD, 'b'],
+          [described_class::Token::EOV, nil]
+        ]
+      end
+
+      it 'handles caret character' do
+        expect(described_class.new('6.0.^').send(:tokens)).to eq [
+          [described_class::Token::NUMBER, 6],
+          [described_class::Token::NUMBER, 0],
+          [described_class::Token::MAX, '^'],
+          [described_class::Token::EOV, nil]
+        ]
+        expect(described_class.new('6.0.beta^').send(:tokens)).to eq [
+          [described_class::Token::NUMBER, 6],
+          [described_class::Token::PREVERSION, 'beta'],
+          [described_class::Token::MAX, '^'],
+          [described_class::Token::EOV, nil]
+        ]
+        expect(described_class.new('6.0.beta^5').send(:tokens)).to eq [
+          [described_class::Token::NUMBER, 6],
+          [described_class::Token::PREVERSION, 'beta'],
+          [described_class::Token::CARET, '^'],
+          [described_class::Token::NUMBER, 5],
+          [described_class::Token::EOV, nil]
+        ]
+        expect(described_class.new('17^2').send(:tokens)).to eq [
+          [described_class::Token::NUMBER, 17],
+          [described_class::Token::CARET, '^'],
+          [described_class::Token::NUMBER, 2],
           [described_class::Token::EOV, nil]
         ]
       end

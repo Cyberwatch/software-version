@@ -60,6 +60,7 @@ module SoftwareVersion
       #   < 1_1 (UNDERSCORE)
       #   < 1.1 (DOT)
       #   < 1:1 (EPOCH)
+      #   < ^ (MAX)
       #
       # COLON, DOT and TILDE are only used as a literal tokens and are stripped
       # from the semantic tokens. Their only use is to separate numbers. Some
@@ -71,11 +72,13 @@ module SoftwareVersion
       PLUS = 31
       TILDE = 32
       COLON = 33
+      CARET = 34
       WORD = 40
       UNDERSCORE = 50
       DOT = 51
       NUMBER = 52
       EPOCH = 60
+      MAX = 99
     end
 
     # Returns an Array of Token. It is fully loaded and cached to boost future
@@ -94,6 +97,7 @@ module SoftwareVersion
         '+' => Token::PLUS,
         '-' => Token::DASH,
         ':' => Token::COLON,
+        '^' => Token::CARET,
         '_' => Token::UNDERSCORE,
         '0' => Token::NUMBER,
         '1' => Token::NUMBER,
@@ -166,6 +170,12 @@ module SoftwareVersion
         # previous NUMBER into an EPOCH, which is handled by the NUMBER case.
         when Token::COLON
 
+        # In case the version ends with '^', we consider that it is highest version possible
+        # For example: '6.0.^' > '6.0.999999'
+        # If this is not the final character, then we treat it as the literal CARET character
+        when Token::CARET
+          semantic_tokens << (ahead[0] == Token::EOV ? [Token::MAX, current[1]] : current)
+
         when Token::WORD
           case current[1]
           # Some special words are just fancy ways of making a subversion.
@@ -205,11 +215,12 @@ module SoftwareVersion
     # Normalize versions by dropping useless zeroes in order to have 1.0.0 = 1.
     # This step is performed after semantic parsing because we want 1.0.r1 ≠
     # 1r1, but also 1.0.noarch = 1.noarch.
+    # Token::MAX should work as Token::NUMBER so 6.^ != 6.0.^ and 6.0.^ < 6.1
     def normalize(tokens)
       new_tokens = []
       held_tokens = []
       tokens.each do |token|
-        if token[0] == Token::NUMBER
+        if [Token::NUMBER, Token::MAX].include?(token[0])
           if token[1] == 0
             held_tokens << token
             next
