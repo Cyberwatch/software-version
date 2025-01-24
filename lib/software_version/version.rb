@@ -97,12 +97,14 @@ module SoftwareVersion
     # same type are grouped together to form a single unit.
     CHARACTERS_TOKEN = {
         '.' => Token::DOT,
+        ',' => Token::DOT,
         '~' => Token::TILDE,
         '+' => Token::PLUS,
         '-' => Token::DASH,
         ':' => Token::COLON,
         '^' => Token::CARET,
         '_' => Token::UNDERSCORE,
+        ' ' => Token::UNDERSCORE,
         '0' => Token::NUMBER,
         '1' => Token::NUMBER,
         '2' => Token::NUMBER,

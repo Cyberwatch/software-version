@@ -117,6 +117,11 @@ module SoftwareVersion
       end
     end
 
+    specify 'character equivalence' do
+      expect(Version.new('1,1')).to eq '1.1'
+      expect(Version.new('1 1')).to eq '1_1'
+    end
+
     specify '#epoch' do
       expect(Version.new('').epoch).to eq 0
       expect(Version.new('1.0').epoch).to eq 0
