@@ -120,7 +120,7 @@ module SoftwareVersion
     def lex(version_string)
       tokens = []
       chunk_type = nil
-      chunk_value = ''
+      chunk_value = String.new
       commit = ->() {
         case chunk_type
         when nil then return
@@ -129,7 +129,7 @@ module SoftwareVersion
         else tokens << [chunk_type, chunk_value]
         end
         chunk_type = nil
-        chunk_value = ''
+        chunk_value = String.new
       }
       version_string.each_char do |c|
         char_type = CHARACTERS_TOKEN[c]
