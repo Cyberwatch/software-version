@@ -96,33 +96,34 @@ module SoftwareVersion
     # Associate characters to their token types. Multiple characters of the
     # same type are grouped together to form a single unit.
     CHARACTERS_TOKEN = {
-        '.' => Token::DOT,
-        ',' => Token::DOT,
-        '~' => Token::TILDE,
-        '+' => Token::PLUS,
-        '-' => Token::DASH,
-        ':' => Token::COLON,
-        '^' => Token::CARET,
-        '_' => Token::UNDERSCORE,
-        ' ' => Token::UNDERSCORE,
-        '0' => Token::NUMBER,
-        '1' => Token::NUMBER,
-        '2' => Token::NUMBER,
-        '3' => Token::NUMBER,
-        '4' => Token::NUMBER,
-        '5' => Token::NUMBER,
-        '6' => Token::NUMBER,
-        '7' => Token::NUMBER,
-        '8' => Token::NUMBER,
-        '9' => Token::NUMBER,
-      }.tap { |h| h.default = Token::WORD }.freeze
+      '.' => Token::DOT,
+      ',' => Token::DOT,
+      '~' => Token::TILDE,
+      '+' => Token::PLUS,
+      '-' => Token::DASH,
+      ':' => Token::COLON,
+      '^' => Token::CARET,
+      '_' => Token::UNDERSCORE,
+      ' ' => Token::UNDERSCORE,
+      '0' => Token::NUMBER,
+      '1' => Token::NUMBER,
+      '2' => Token::NUMBER,
+      '3' => Token::NUMBER,
+      '4' => Token::NUMBER,
+      '5' => Token::NUMBER,
+      '6' => Token::NUMBER,
+      '7' => Token::NUMBER,
+      '8' => Token::NUMBER,
+      '9' => Token::NUMBER,
+    }.tap { |h| h.default = Token::WORD }.freeze
+    private_constant :CHARACTERS_TOKEN
 
     # Cut the version string into literal tokens, without further
     # interpretation. 1:2.3beta becomes NUMBER COLON NUMBER NUMBER WORD EOV. Returns an Array of Token.
     def lex(version_string)
       tokens = []
       chunk_type = nil
-      chunk_value = String.new
+      chunk_value = +''
       commit = ->() {
         case chunk_type
         when nil then return
@@ -131,7 +132,7 @@ module SoftwareVersion
         else tokens << [chunk_type, chunk_value]
         end
         chunk_type = nil
-        chunk_value = String.new
+        chunk_value = +''
       }
       version_string.each_char do |c|
         char_type = CHARACTERS_TOKEN[c]
